@@ -1,4 +1,3 @@
-use std::f64::consts;
 
 use crate::{
     ast::Node,
@@ -43,26 +42,7 @@ impl Parser {
         Ok(())
     }
 
-    fn functions(func: String) -> anyhow::Result<impl Fn(f64) -> f64> {
-        Ok(match func.as_str() {
-            "sqrt" => |x: f64| x.sqrt(),
-            "ln" => |x: f64| x.ln(),
-            "abs" => |x: f64| x.abs(),
-            "cos" => |x: f64| x.cos(),
-            "sin" => |x: f64| x.sin(),
-            "tan" => |x: f64| x.tan(),
-            "log" => |x: f64| x.log10(),
-            _ => anyhow::bail!("invalid function name: {}", func),
-        })
-    }
-
-    fn constants(con: String) -> anyhow::Result<f64> {
-        match con.as_str() {
-            "pi" => Ok(consts::PI),
-            "e" => Ok(consts::E),
-            _ => anyhow::bail!("invalid constant name: {}", con),
-        }
-    }
+    
 
     fn factor(&mut self) -> anyhow::Result<Node> {
         let token = self.current_token.clone();
@@ -83,12 +63,11 @@ impl Parser {
                 self.eat(TokenType::Ident)?;
                 if self.current_token.token == TokenType::LParen {
                     self.eat(TokenType::LParen)?;
-                    let function = Self::functions(token.value.clone())?;
                     let inner = self.expr()?;
                     self.eat(TokenType::RParen)?;
-                    Ok(Node::Function(token.value, Box::new(function), Box::new(inner)))
+                    Ok(Node::Function(token.value, Box::new(inner)))
                 } else {
-                    Ok(Node::Number(Self::constants(token.value)?))
+                    Ok(Node::Const(token.value))
                 }
             }
             _ => Err(self.error(&token, TokenType::Number)),
@@ -158,9 +137,33 @@ impl Parser {
     }
 
     fn assign(&mut self) -> anyhow::Result<Node> {
-        let mut result = self.expr()?;
 
-        if 
+        let token = self.current_token.clone();
+        if token.token == TokenType::Ident {
+            self.eat(TokenType::Ident)?;
+            let mut func_param = None;
+            if self.current_token.token == TokenType::LParen {
+                self.eat(TokenType::LParen)?;
+                func_param = Some(self.current_token.clone());
+                self.eat(TokenType::Ident)?;
+                self.eat(TokenType::RParen)?;
+            }
+
+            if self.current_token.token == TokenType::Assign {
+                if let Some(func_param) = func_param {
+                    Ok(Node::AssignFunc(token.value, func_param.value, Box::new(self.expr()?)))
+                } else {
+                    Ok(Node::AssignConst(token.value, Box::new(self.expr()?)))
+                }
+            } else {
+                anyhow::bail!("test");
+            }
+            
+        } else {
+            self.expr()
+        }
+
+        
 
     }
 
