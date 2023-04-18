@@ -128,6 +128,6 @@ impl Lexer {
                 break;
             }
         }
-        Ok(Token::default())
+        Ok(Token::new("".to_owned(), TokenType::EOI, self.text.len() - 1))
     }
 }

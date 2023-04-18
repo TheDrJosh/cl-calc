@@ -15,12 +15,6 @@ impl Token {
     }
 }
 
-impl Default for Token {
-    fn default() -> Self {
-        Self { value: Default::default(), token: TokenType::EOI, start: Default::default() }
-    }
-}
-
 #[derive(PartialEq, Debug, Clone)]
 pub enum TokenType {
     Number,

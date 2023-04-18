@@ -1,10 +1,10 @@
 use std::io::Write;
 
-use interpreter::Interpreter;
-
 mod token;
 mod lexer;
 mod interpreter;
+mod parser;
+mod ast;
 
 
 
@@ -21,17 +21,8 @@ fn main() {
             continue;
         }
 
-        let mut inter = match Interpreter::new(text.clone()) {
-            Ok(inter) => {
-                inter
-            },
-            Err(err) => {
-                println!("{}", err);
-                text.clear();
-                continue;
-            },
-        };
-        match inter.calc() {
+
+        match interpreter::run(text.clone()) {
             Ok(result) => {
                 println!("{}", result);
             },
