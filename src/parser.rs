@@ -157,8 +157,18 @@ impl Parser {
         Ok(result)
     }
 
+    fn assign(&mut self) -> anyhow::Result<Node> {
+        let mut result = self.expr()?;
+
+        if 
+
+    }
+
+
     pub fn calc(&mut self) -> anyhow::Result<Node> {
         let res = self.expr()?;
+
+
 
         self.eat(TokenType::EOI)?;
 

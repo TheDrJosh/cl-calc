@@ -103,6 +103,10 @@ impl Lexer {
                         self.advance();
                         return Ok(Token::new(String::from(")"), TokenType::RParen, self.pos));
                     }
+                    '=' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("="), TokenType::RParen, self.pos));
+                    }
                     _ => {}
                 };
 

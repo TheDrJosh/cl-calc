@@ -22,4 +22,5 @@ pub enum Operator {
     Mult,
     Div,
     Pow,
+    Assign,
 }

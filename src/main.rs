@@ -1,16 +1,19 @@
 use std::io::Write;
 
+use crate::interpreter::Interpreter;
+
 mod token;
 mod lexer;
 mod interpreter;
 mod parser;
 mod ast;
-mod program_state;
 
 fn main() {
     let mut text = String::new();
 
     println!("Welcome To CL Calc a command line calculator tool:\nenter \"!exit\" to exit or \"!help\" for additional help.");
+
+    let mut interpreter = Interpreter::default();
 
     loop {
         print!("calc> ");
@@ -34,7 +37,7 @@ fn main() {
             continue;
         }
 
-        match interpreter::run(text.clone()) {
+        match interpreter.run(text.clone()) {
             Ok(result) => {
                 println!("{}", result);
             },

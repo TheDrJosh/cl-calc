@@ -27,4 +27,5 @@ pub enum TokenType {
     RParen,
     Ident,
     EOI,
+    Assign,
 }
