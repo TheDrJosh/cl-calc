@@ -16,7 +16,7 @@ impl Lexer {
         }
     }
 
-    pub fn advance(&mut self) {
+    fn advance(&mut self) {
         self.pos += 1;
 
         if self.pos > self.text.len() - 1 {
@@ -26,13 +26,13 @@ impl Lexer {
         }
     }
 
-    pub fn skip_whitespace(&mut self) {
+    fn skip_whitespace(&mut self) {
         while self.current_char.map_or(false, |char| char.is_whitespace()) {
             self.advance();
         }
     }
 
-    pub fn identifier(&mut self) -> Token{
+    fn identifier(&mut self) -> Token{
         let mut result = String::default();
         let pos = self.pos;
 
@@ -44,7 +44,7 @@ impl Lexer {
         Token::new(result, TokenType::Ident, pos)
     }
 
-    pub fn number(&mut self) -> Token {
+    fn number(&mut self) -> Token {
         let mut result = String::default();
         let pos = self.pos;
         

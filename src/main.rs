@@ -6,9 +6,6 @@ mod interpreter;
 mod parser;
 mod ast;
 
-
-
-
 fn main() {
     let mut text = String::new();
 
@@ -21,13 +18,12 @@ fn main() {
             continue;
         }
 
-
         match interpreter::run(text.clone()) {
             Ok(result) => {
                 println!("{}", result);
             },
             Err(err) => {
-                println!("{}", err);
+                println!("err: {}", err);
             },
         }
         text.clear()

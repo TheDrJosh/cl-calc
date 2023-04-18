@@ -83,7 +83,6 @@ impl Parser {
                 self.eat(TokenType::Ident)?;
                 if self.current_token.token == TokenType::LParen {
                     self.eat(TokenType::LParen)?;
-
                     let function = Self::functions(token.value.clone())?;
                     let inner = self.expr()?;
                     self.eat(TokenType::RParen)?;
