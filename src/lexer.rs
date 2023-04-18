@@ -32,7 +32,7 @@ impl Lexer {
         }
     }
 
-    fn identifier(&mut self) -> Token{
+    fn identifier(&mut self) -> Token {
         let mut result = String::default();
         let pos = self.pos;
 
@@ -47,7 +47,7 @@ impl Lexer {
     fn number(&mut self) -> Token {
         let mut result = String::default();
         let pos = self.pos;
-        
+
         if self.current_char == Some('-') {
             result.push('-');
             self.advance();
@@ -74,6 +74,38 @@ impl Lexer {
     pub fn get_next_token(&mut self) -> anyhow::Result<Token> {
         loop {
             if let Some(current_char) = self.current_char {
+                match current_char {
+                    '+' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("+"), TokenType::Add, self.pos));
+                    }
+                    '-' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("-"), TokenType::Sub, self.pos));
+                    }
+                    '*' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("*"), TokenType::Mult, self.pos));
+                    }
+                    '/' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("/"), TokenType::Div, self.pos));
+                    }
+                    '^' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("^"), TokenType::Exp, self.pos));
+                    }
+                    '(' => {
+                        self.advance();
+                        return Ok(Token::new(String::from("("), TokenType::LParen, self.pos));
+                    }
+                    ')' => {
+                        self.advance();
+                        return Ok(Token::new(String::from(")"), TokenType::RParen, self.pos));
+                    }
+                    _ => {}
+                };
+
                 if current_char.is_whitespace() {
                     self.skip_whitespace();
                     continue;
@@ -84,50 +116,18 @@ impl Lexer {
                 }
 
                 if current_char.is_alphabetic() {
-                    return Ok(self.identifier())
+                    return Ok(self.identifier());
                 }
-
-                if current_char == '+' {
-                    self.advance();
-                    return Ok(Token::new(String::from("+"), TokenType::Add, self.pos));
-                }
-
-                if current_char == '-' {
-                    self.advance();
-                    return Ok(Token::new(String::from("-"), TokenType::Sub, self.pos));
-                }
-
-                if current_char == '*' {
-                    self.advance();
-                    return Ok(Token::new(String::from("*"), TokenType::Mult, self.pos));
-                }
-
-                if current_char == '/' {
-                    self.advance();
-                    return Ok(Token::new(String::from("/"), TokenType::Div, self.pos));
-                }
-
-                if current_char == '^' {
-                    self.advance();
-                    return Ok(Token::new(String::from("^"), TokenType::Exp, self.pos));
-                }
-
-                if current_char == '(' {
-                    self.advance();
-                    return Ok(Token::new(String::from("("), TokenType::LParen, self.pos));
-                }
-
-                if current_char == ')' {
-                    self.advance();
-                    return Ok(Token::new(String::from(")"), TokenType::RParen, self.pos));
-                }
-                
 
                 anyhow::bail!("Invalid character");
             } else {
                 break;
             }
         }
-        Ok(Token::new("".to_owned(), TokenType::EOI, self.text.len() - 1))
+        Ok(Token::new(
+            "".to_owned(),
+            TokenType::EOI,
+            self.text.len() - 1,
+        ))
     }
 }

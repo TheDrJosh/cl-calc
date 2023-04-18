@@ -3,7 +3,6 @@ use crate::{ast::Node, parser::Parser};
 pub fn run(text: String) -> anyhow::Result<f64> {
     let mut parser = Parser::new(text)?;
     let node = parser.calc()?;
-    //println!("{:?}", node);
     step(node)
 }
 
