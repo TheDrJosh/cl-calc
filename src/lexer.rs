@@ -36,7 +36,7 @@ impl Lexer {
         let mut result = String::default();
         let pos = self.pos;
 
-        while self.current_char.unwrap().is_alphabetic() {
+        while self.current_char.map_or(false, |char| char.is_alphabetic()) {
             result.push(self.current_char.unwrap());
             self.advance();
         }
@@ -53,7 +53,7 @@ impl Lexer {
             self.advance();
         }
 
-        while self.current_char.unwrap().is_ascii_digit() {
+        while self.current_char.map_or(false, |char| char.is_ascii_digit()) {
             result.push(self.current_char.unwrap());
             self.advance();
         }
@@ -63,7 +63,7 @@ impl Lexer {
             self.advance();
         }
 
-        while self.current_char.unwrap().is_ascii_digit() {
+        while self.current_char.map_or(false, |char| char.is_ascii_digit()) {
             result.push(self.current_char.unwrap());
             self.advance();
         }
@@ -105,7 +105,7 @@ impl Lexer {
                     }
                     '=' => {
                         self.advance();
-                        return Ok(Token::new(String::from("="), TokenType::RParen, self.pos));
+                        return Ok(Token::new(String::from("="), TokenType::Assign, self.pos));
                     }
                     _ => {}
                 };
@@ -134,4 +134,17 @@ impl Lexer {
             self.text.len() - 1,
         ))
     }
+
+    pub fn get_all_tokens(&mut self) -> anyhow::Result<Vec<Token>> {
+        let mut res = Vec::new();
+        loop {
+            let token = self.get_next_token()?;
+            res.push(token.clone());
+            if token.token == TokenType::EOI {
+                break;
+            }
+        }
+        Ok(res)
+    }
+
 }

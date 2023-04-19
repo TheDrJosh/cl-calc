@@ -4,24 +4,38 @@ use crate::{ast::Node, parser::Parser};
 
 #[derive(Default)]
 pub struct Interpreter {
-    consts: HashMap<String, f64>,
-    funcs: HashMap<String, (String, Node)>,
-    temp_consts: Vec<(String, f64)>,
+    pub consts: HashMap<String, f64>,
+    pub funcs: HashMap<String, (String, Node)>,
 }
 
 impl Interpreter {
-    fn functions(&self, func: String) -> anyhow::Result<impl Fn(f64) -> f64> {
+    fn functions(&mut self, func: String, x: f64) -> anyhow::Result<f64> {
         Ok(match func.as_str() {
-            "sqrt" => |x: f64| x.sqrt(),
-            "ln" => |x: f64| x.ln(),
-            "abs" => |x: f64| x.abs(),
-            "cos" => |x: f64| x.cos(),
-            "sin" => |x: f64| x.sin(),
-            "tan" => |x: f64| x.tan(),
-            "log" => |x: f64| x.log10(),
+            "sqrt" => x.sqrt(),
+            "ln" => x.ln(),
+            "abs" => x.abs(),
+            "cos" => x.cos(),
+            "sin" => x.sin(),
+            "tan" => x.tan(),
+            "log" => x.log10(),
             _ => {
+                if let Some((var, body)) = self
+                    .funcs
+                    .get(&func)
+                    .map(|(var, body)| (var.clone(), body.clone()))
+                {
+                    let temp = self.consts.insert(var.clone(), x);
 
-                anyhow::bail!("invalid function name: {}", func)
+                    let res = self.step(body.clone())?;
+
+                    if let Some(temp) = temp {
+                        self.consts.insert(var.clone(), temp);
+                    }
+
+                    res
+                } else {
+                    anyhow::bail!("invalid function name: {}", func)
+                }
             }
         })
     }
@@ -56,7 +70,10 @@ impl Interpreter {
                 crate::ast::Operator::Div => self.step(*node1)? / self.step(*node2)?,
                 crate::ast::Operator::Pow => self.step(*node1)?.powf(self.step(*node2)?),
             },
-            Node::Function(func, node) => self.functions(func)?(self.step(*node)?),
+            Node::Function(func, node) => {
+                let val = self.step(*node)?;
+                self.functions(func, val)?
+            }
             Node::AssignConst(name, expr) => {
                 let val = self.step(*expr)?;
                 self.consts.insert(name, val);
