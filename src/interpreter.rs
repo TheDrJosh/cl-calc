@@ -6,6 +6,7 @@ use crate::{ast::Node, parser::Parser};
 pub struct Interpreter {
     pub consts: HashMap<String, f64>,
     pub funcs: HashMap<String, (String, Node)>,
+    pub ans: f64,
 }
 
 impl Interpreter {
@@ -18,6 +19,7 @@ impl Interpreter {
             "sin" => x.sin(),
             "tan" => x.tan(),
             "log" => x.log10(),
+            "ans" => self.ans,
             _ => {
                 if let Some((var, body)) = self
                     .funcs
@@ -57,7 +59,9 @@ impl Interpreter {
     pub fn run(&mut self, text: String) -> anyhow::Result<f64> {
         let mut parser = Parser::new(text)?;
         let node = parser.calc()?;
-        self.step(node)
+        let res = self.step(node)?;
+        self.ans = res;
+        Ok(res)
     }
 
     fn step(&mut self, node: Node) -> anyhow::Result<f64> {

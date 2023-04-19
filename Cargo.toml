@@ -1,11 +1,12 @@
 [package]
-name = "clcalc"
-version = "0.1.0"
+name = "cl-calc"
+version = "1.0.0"
 edition = "2021"
 authors = ["Joshua Honse"]
-description = "desc"
+description = "A command line calculator."
 repository = "https://github.com/TheDrJosh/cl-calc"
 license-file = "LICENSE"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
