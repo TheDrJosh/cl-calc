@@ -123,7 +123,7 @@ impl Lexer {
                     return Ok(self.identifier());
                 }
 
-                anyhow::bail!("Invalid character");
+                anyhow::bail!("Invalid character: {}", current_char);
             } else {
                 break;
             }

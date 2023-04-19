@@ -1,5 +1,5 @@
 f(x) = tan(x) + 1
 b(n) = f(x) - 1
 phi = (1 + sqrt(5)) / 2
-b(f(pi)) / cos(pi)
+!b(f(pi)) / cos(pi)
 1 / phi

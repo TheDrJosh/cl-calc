@@ -1,6 +1,4 @@
-use std::{io::Write, path::PathBuf, fs};
-
-use clap::Parser;
+use std::{env, fs, io::Write, path::PathBuf};
 
 use crate::interpreter::Interpreter;
 
@@ -10,37 +8,66 @@ mod lexer;
 mod parser;
 mod token;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Path to file with calculator commands
-    #[arg(short, long)]
-    file: Option<PathBuf>,
-}
-
 fn main() {
-    let args = Args::parse();
+    let args: Vec<String> = env::args().collect();
+    let mut file: Option<PathBuf> = None;
+    if let Some(flag) = args.get(1) {
+        if flag == "-f" || flag == "--file" {
+            if let Some(path_str) = args.get(2) {
+                match path_str.parse() {
+                    Ok(path) => file = Some(path),
+                    Err(err) => {
+                        eprintln!("err: {}", err);
+                        return;
+                    }
+                }
+            }
+        }
+        if flag == "-v" || flag == "--version" {
+            println!("version: {}", env!("CARGO_PKG_VERSION"));
+            return;
+        }
+        if flag == "--author" {
+            println!("author: {}", env!("CARGO_PKG_AUTHORS"));
+            return;
+        }
+        if flag == "--about" {
+            println!("{}", env!("CARGO_PKG_DESCRIPTION"));
+            println!("You can find CL Calc at {}", env!("CARGO_PKG_REPOSITORY"));
+            return;
+        }
+        if flag == "-h" || flag == "-?" ||flag == "--help" {
+            todo!();
+            return;
+        }
+    }
+
 
     let mut interpreter: Interpreter = Interpreter::default();
 
-    if let Some(path) = args.file {
-        
-        let contents = fs::read_to_string(path)
-        .expect("Should have been able to read the file");
+    if let Some(path) = file {
+        let contents = fs::read_to_string(path).expect("Should have been able to read the file");
 
         let mut out = 0.;
 
         for line in contents.split('\n') {
-            out = match interpreter.run(line.to_owned()) {
+            let mut line = line.to_owned();
+            let do_out = line.chars().next() == Some('!');
+            if do_out {
+                line.remove(0);
+            }
+            out = match interpreter.run(line) {
                 Ok(val) => val,
                 Err(err) => {
-                    println!("err: {}", err);
+                    eprintln!("err: {}", err);
                     return;
-                },
+                }
+            };
+            if do_out {
+                println!("!{}", out);
             }
         }
         println!("{}", out);
-
     } else {
         let mut text = String::new();
 
@@ -90,8 +117,7 @@ fn main() {
                     println!("{}", result);
                 }
                 Err(err) => {
-                    println!("err: {}", err);
-                    //println!("backtrace: {}", err.backtrace())
+                    eprintln!("err: {}", err);
                 }
             }
             text.clear()
