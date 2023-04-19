@@ -29,7 +29,7 @@ fn main() {
         }
         if flag == "--about" {
             let authors = env!("CARGO_PKG_AUTHORS");
-            println!("CL Calc was made by {authors} as a project to learn how to make an interperator. I know it is ineffitent and redundent but it was a fun side project. ");
+            println!("CL Calc was made by {authors} as a project to learn how to make an interpreter. I know it is inefficient and redundant but it was a fun side project.");
             println!(
                 "You can find the CL Calc repo at {}",
                 env!("CARGO_PKG_REPOSITORY")
@@ -38,11 +38,11 @@ fn main() {
         }
         if flag == "-h" || flag == "-?" || flag == "--help" {
             println!("{}\n", env!("CARGO_PKG_DESCRIPTION"));
-            println!("Usage clcalc [OPTIONS]\n");
+            println!("Usage {} [OPTIONS]\n", env!("CARGO_PKG_NAME"));
             println!("OPTIONS:");
             println!("  -f, --file      Run file of calculations");
             println!("  -v, --version   Print version info");
-            println!("      --about     Print information about clcalc");
+            println!("      --about     Print information about {}", env!("CARGO_PKG_NAME"));
             println!("  -h, -?, --help  Print this message");
 
             return;
