@@ -1,3 +1,5 @@
+#![feature(iter_intersperse)]
+
 use std::{env, fs, io::Write, path::PathBuf};
 
 use crate::interpreter::Interpreter;
@@ -12,17 +14,6 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let mut file: Option<PathBuf> = None;
     if let Some(flag) = args.get(1) {
-        if flag == "-f" || flag == "--file" {
-            if let Some(path_str) = args.get(2) {
-                match path_str.parse() {
-                    Ok(path) => file = Some(path),
-                    Err(err) => {
-                        eprintln!("err: {}", err);
-                        return;
-                    }
-                }
-            }
-        }
         if flag == "-v" || flag == "--version" {
             println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
             return;
@@ -38,52 +29,49 @@ fn main() {
         }
         if flag == "-h" || flag == "-?" || flag == "--help" {
             println!("{}\n", env!("CARGO_PKG_DESCRIPTION"));
-            println!("Usage {} [OPTIONS]\n", env!("CARGO_PKG_NAME"));
+            println!("Usage {} [PATH] [OPTIONS]\n", env!("CARGO_PKG_NAME"));
+            println!("PATH: Run file of calculations");
             println!("OPTIONS:");
-            println!("  -f, --file      Run file of calculations");
             println!("  -v, --version   Print version info");
-            println!("      --about     Print information about {}", env!("CARGO_PKG_NAME"));
+            println!(
+                "      --about     Print information about {}",
+                env!("CARGO_PKG_NAME")
+            );
             println!("  -h, -?, --help  Print this message");
 
             return;
+        }
+        if let Some(path_str) = args.get(1) {
+            match path_str.parse() {
+                Ok(path) => file = Some(path),
+                Err(err) => {
+                    eprintln!("err: {}", err);
+                    return;
+                }
+            }
         }
     }
 
     let mut interpreter: Interpreter = Interpreter::default();
 
     if let Some(path) = file {
-        let contents = match fs::read_to_string(path) {
-            Ok(contents) => contents,
-            Err(err) => {
-                eprintln!("file err: {err}");
-                return;
-            }
-        };
-
-        for line in contents.split('\n') {
-            let mut line = line.to_owned();
-            let do_out = line.chars().next() == Some('!');
-            if do_out {
-                line.remove(0);
-            }
-            let out = match interpreter.run(line) {
-                Ok(val) => val,
-                Err(err) => {
-                    eprintln!("err: {}", err);
-                    return;
+        match interpreter.run_file(path) {
+            Ok((debug_out, res)) => {
+                for out in debug_out {
+                    println!("! {}", out);
                 }
-            };
-            if do_out {
-                println!("!{}", out);
+                println!("{}", res);
             }
+            Err(err) => eprintln!("err: {}", err),
         }
-        println!("{}", interpreter.ans);
+        return;
     } else {
         let mut text = String::new();
 
         println!("Welcome To CL Calc a command line calculator tool:\nEnter \"!exit\" to exit or \"!help\" for additional help.\nRun with \"-?\" to see valid arguments.");
 
         loop {
+            text.clear();
             print!("calc> ");
             std::io::stdout().flush().unwrap();
             std::io::stdin().read_line(&mut text).unwrap();
@@ -106,7 +94,9 @@ fn main() {
                 );
                 println!("You can define custom constants with name = expression.");
                 println!("You can enter !vars to see custom functions and constants.");
-                println!("You can run CL Calc with -f or --file followed by a path to run a file to run a list of calculations.");
+                println!("You can run CL Calc followed by a path to run a file to run a list of calculations.");
+                println!("You can enter !file <path> to run a list of calculations.");
+                println!("You can enter !out <path> to output all successfully run commands.");
                 continue;
             }
 
@@ -128,11 +118,39 @@ fn main() {
                 continue;
             }
 
+            if text.trim().get(0..6) == Some("!file ") {
+                match interpreter.run_file(text.trim().get(6..).unwrap_or_default().into()) {
+                    Ok((debug_out, res)) => {
+                        for out in debug_out {
+                            println!("! {}", out);
+                        }
+                        println!("{}", res);
+                    }
+                    Err(err) => eprintln!("err: {}", err),
+                }
+
+                continue;
+            }
+
+            if text.trim().get(0..5) == Some("!out ") {
+
+                let path: PathBuf =
+                    if let Some(Ok(path)) = text.trim().get(5..).map(|arg| arg.try_into()) {
+                        path
+                    } else {
+                        eprintln!("err: No Path");
+                        continue;
+                    };
+
+                if let Err(err) = fs::write(path, interpreter.executed_lines.join("\n")) {
+                    eprintln!("err: {}", err);
+                }
+
+                continue;
+            }
+
             if text.trim().chars().next() == Some('!') {
-                println!(
-                    "err: Invalid Command {}",
-                    text.trim().get(1..).unwrap_or_default()
-                );
+                println!("err: Invalid Command {}", text);
                 continue;
             }
 
@@ -144,7 +162,6 @@ fn main() {
                     eprintln!("err: {}", err);
                 }
             }
-            text.clear()
         }
     }
 }

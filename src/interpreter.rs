@@ -1,12 +1,13 @@
-use std::{collections::HashMap, f64::consts};
+use std::{collections::HashMap, f64::consts, path::PathBuf, fs};
 
 use crate::{ast::Node, parser::Parser};
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Interpreter {
     pub consts: HashMap<String, f64>,
     pub funcs: HashMap<String, (String, Node)>,
     pub ans: f64,
+    pub executed_lines: Vec<String>
 }
 
 impl Interpreter {
@@ -19,7 +20,6 @@ impl Interpreter {
             "sin" => x.sin(),
             "tan" => x.tan(),
             "log" => x.log10(),
-            "ans" => self.ans,
             _ => {
                 if let Some((var, body)) = self
                     .funcs
@@ -46,6 +46,7 @@ impl Interpreter {
         match con.as_str() {
             "pi" => Ok(consts::PI),
             "e" => Ok(consts::E),
+            "ans" => Ok(self.ans),
             _ => {
                 if let Some(val) = self.consts.get(&con) {
                     Ok(*val)
@@ -57,11 +58,36 @@ impl Interpreter {
     }
 
     pub fn run(&mut self, text: String) -> anyhow::Result<f64> {
-        let mut parser = Parser::new(text)?;
+        let mut parser = Parser::new(text.clone())?;
         let node = parser.calc()?;
         let res = self.step(node)?;
         self.ans = res;
+        self.executed_lines.push(text.trim().to_owned());
         Ok(res)
+    }
+
+    pub fn run_file(&mut self, path: PathBuf) -> anyhow::Result<(Vec<f64>, f64)> {
+        let contents = fs::read_to_string(path)?;
+
+        let mut interpreter = self.clone();
+
+        let mut debug_out = Vec::new();
+
+        for line in contents.split('\n') {
+            let mut line = line.to_owned();
+            let do_out = line.chars().next() == Some('!');
+            if do_out {
+                line.remove(0);
+            }
+            let out = interpreter.run(line)?;
+            if do_out {
+                debug_out.push(out);
+            }
+        }
+
+        *self = interpreter;
+        
+        Ok((debug_out, self.ans))
     }
 
     fn step(&mut self, node: Node) -> anyhow::Result<f64> {
