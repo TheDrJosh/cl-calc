@@ -165,8 +165,6 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use std::error;
-
     use super::*;
 
     #[test]
