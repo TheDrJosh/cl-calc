@@ -1,5 +1,3 @@
-#![feature(iter_intersperse)]
-
 use std::{env, fs, io::Write, path::PathBuf};
 
 use crate::interpreter::Interpreter;
