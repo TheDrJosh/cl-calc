@@ -133,7 +133,6 @@ fn main() {
             }
 
             if text.trim().get(0..5) == Some("!out ") {
-
                 let path: PathBuf =
                     if let Some(Ok(path)) = text.trim().get(5..).map(|arg| arg.try_into()) {
                         path
@@ -163,5 +162,20 @@ fn main() {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::error;
+
+    use super::*;
+
+    #[test]
+    fn interpreter_file() {
+        let mut inter = Interpreter::default();
+        let result = inter.run_file("example.calc".into()).unwrap();
+        assert_eq!(result.0[0], 0.00000000000000011102230246251565);
+        assert_eq!(result.1, 0.6180339887498948);
     }
 }
