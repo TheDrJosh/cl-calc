@@ -1,13 +1,15 @@
 # CL Calc
 
-[![Build Status](https://github.com/TheDrJosh/cl-calc/workflows/RUST/badge.svg)](https://github.com/TheDrJosh/cl-calc/actions)
 [![Crates.io][crates-badge]][crates-url]
 [![MIT licensed][mit-badge]][mit-url]
+[![Build Status][actions-badge]][actions-url]
 
-[crates-badge]: https://img.shields.io/crates/v/tokio.svg
-[crates-url]: https://crates.io/crates/tokio
+[crates-badge]: https://img.shields.io/crates/v/cl-calc.svg
+[crates-url]: https://crates.io/crates/cl-calc
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [mit-url]: https://github.com/tokio-rs/tokio/blob/master/LICENSE
+[actions-badge]: https://github.com/TheDrJosh/cl-calc/workflows/Rust/badge.svg
+[actions-url]: https://github.com/TheDrJosh/cl-calc/actions?query=branch%3Amaster
 
 CL Calc is command line calculator that I made as a side project to learn to make a interpreter. It is messy and inefficient but is a fun proof of concept.
 
