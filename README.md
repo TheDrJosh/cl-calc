@@ -2,6 +2,12 @@
 
 CL Calc is command line calculator that I made as a side project to learn to make a interpreter. It is messy and inefficient but is a fun proof of concept.
 
+To install you can either:
+
+1. Build from source
+2. Install with cargo using "cargo install cl-calc"
+
+
 Running the program with no arguments allows you to enter commands line by line similar to how node works. Run with a path as the first argument to run the commands in that file. (I use ".calc" but is doesn't matter).
 
 The valid options are:
