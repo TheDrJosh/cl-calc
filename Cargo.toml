@@ -1,6 +1,6 @@
 [package]
 name = "cl-calc"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["Joshua Honse"]
 description = "A command line calculator."
