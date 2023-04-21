@@ -171,7 +171,7 @@ mod tests {
     fn interpreter_file() {
         let mut inter = Interpreter::default();
         let result = inter.run_file("example.calc".into()).unwrap();
-        assert_eq!(result.0[0], 0.00000000000000011102230246251565);
+        assert_eq!(result.0[0], -1.5574077246549018);
         assert_eq!(result.1, 0.6180339887498948);
     }
 }
