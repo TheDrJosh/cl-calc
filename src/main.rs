@@ -86,7 +86,7 @@ fn main() {
                 println!("The built in functions are:\n- sqrt(x)\n- ln(x)\n- abs(x)\n- cos(x)\n- sin(x)\n- tan(x)\n- log(x)");
                 println!("You can define custom functions with name(x) = expression.");
                 println!(
-                    "The built in constants are:\n- pi: {}\n- e: {}\nans: the result of the previous calculation",
+                    "The built in constants are:\n- pi: {}\n- e: {}\n- ans: the result of the previous calculation",
                     std::f64::consts::PI,
                     std::f64::consts::E
                 );

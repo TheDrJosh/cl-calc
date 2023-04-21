@@ -32,6 +32,8 @@ impl Interpreter {
 
                     if let Some(temp) = temp {
                         self.consts.insert(var.clone(), temp);
+                    } else {
+                        self.consts.remove(&var.clone());
                     }
 
                     res
