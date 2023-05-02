@@ -37,9 +37,9 @@ This will exit the program.
 This will give you additional information on how to use this program
 3. `!vars`\
 This will print out all of the names of the user defined functions and constants.
-4. `!file \<path>`
+4. `!file <path>`
 This will execute all of the commands in a file
-5. `!out \<path>`
+5. `!out <path>`
 This will output all successfully run commands to a file
 
 The `!` commands do not work in a file.
